@@ -37,22 +37,22 @@ export const useAuthStore = defineStore('auth', () => {
       await attempt(); // Fetch user data after login
       return null;
     } catch (error) {
-      handleError(error, 'Login failed. Please check your credentials.');
-      throw error;
+      console.error('Login failed:', error);
+      return 'invalid credentials';
     }
   };
 
   const register = async (credentials) => {
     await axios.get('/sanctum/csrf-cookie'); // Initialize CSRF protection
     try {
-      await axios.post('/register', credentials);
-      await attempt(); // Fetch user data after registration
-      return null;
+      const response = await axios.post('/register', credentials);
+      return response.data;
     } catch (error) {
-      handleError(error, 'Registration failed. Please check your credentials.');
-      throw error;
-    } finally {
-      isAuthResolved.value = true;
+      if (error.response && error.response.data.errors) {
+        const errorMessages = Object.values(error.response.data.errors).flat().join(' ');
+        throw new Error(errorMessages);
+      }
+      throw new Error(error.response?.data?.message || 'Registration failed. Please try again.');
     }
   };
 
@@ -62,6 +62,7 @@ export const useAuthStore = defineStore('auth', () => {
       setUser({});
       setRoles([]); // Reset roles
       setAuthenticated(false); // Reset authentication state
+      return null; // Return null jika berhasil
     } catch (error) {
       handleError(error, 'Logout failed. Please try again.');
       throw error;

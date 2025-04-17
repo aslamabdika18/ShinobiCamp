@@ -6,9 +6,14 @@ use App\Http\Controllers\API\PermissionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    $user = $request->user();
+    return response()->json([
+        'user' => $user,
+        'roles' => $user->getRoleNames(),
+        'permissions' => $user->getAllPermissions()->pluck('name')
+    ]);
+});
 
 // Event routes
 Route::middleware('auth:sanctum')->group(function () {

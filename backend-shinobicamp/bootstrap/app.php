@@ -13,6 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
+        $middleware->web(\Illuminate\Cookie\Middleware\EncryptCookies::class);
+        $middleware->web(\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class);
+        $middleware->web(\Illuminate\Session\Middleware\StartSession::class);
+        $middleware->web(\Illuminate\View\Middleware\ShareErrorsFromSession::class);
+        $middleware->web(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
+        $middleware->web(\Illuminate\Routing\Middleware\SubstituteBindings::class);
+        $middleware->web(\Illuminate\Http\Middleware\HandleCors::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

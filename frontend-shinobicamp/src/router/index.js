@@ -150,7 +150,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // Periksa apakah pengguna memiliki role yang diizinkan
-  if (to.meta.allowedRoles && !to.meta.allowedRoles.includes(authStore.role)) {
+  if (to.meta.allowedRoles && !authStore.hasAnyRole(to.meta.allowedRoles)) {
     next('/unauthorized') // Redirect ke halaman unauthorized jika role tidak diizinkan
     return
   }

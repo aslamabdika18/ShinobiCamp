@@ -63,15 +63,17 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
+
+const auth = useAuthStore()
+const router = useRouter()
 
 // State untuk dropdown
 const isDropdownOpen = ref(false)
 
-// Data dummy pengguna yang login
-const user = ref({
-  name: 'John Doe', // Nama user dummy
-})
+// Mengambil data pengguna dari auth store
+const user = computed(() => auth.currentUser)
 
 // Fungsi untuk toggle dropdown
 const toggleDropdown = () => {
@@ -84,14 +86,17 @@ const closeDropdown = () => {
 }
 
 // Fungsi untuk logout
-const logout = () => {
-  // Tambahkan logika logout di sini
-  alert('Logout berhasil!')
-  isDropdownOpen.value = false
-}
-
-// Ambil route yang aktif
-const route = useRoute()
+const logout = async () => {
+  const logoutError = await auth.logout();
+  if (!logoutError) {
+    router.push({ name: 'home' }); // Redirect ke home jika logout berhasil
+  } else {
+    console.error('Logout failed:', logoutError);
+    // Tambahkan notifikasi atau feedback ke pengguna jika diperlukan
+  }
+};
+// Dapatkan route saat ini
+const route = useRouter()
 
 // Judul dinamis berdasarkan route
 const pageTitle = computed(() => {
@@ -125,7 +130,3 @@ const toggleSidebar = () => {
   emit('toggle-sidebar')
 }
 </script>
-
-<style scoped>
-/* Tambahkan gaya kustom jika diperlukan */
-</style>
