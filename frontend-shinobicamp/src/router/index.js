@@ -10,6 +10,16 @@ const router = createRouter({
       name: 'home',
       component: () => import('@/views/HomeView.vue'),
     },
+    {
+      path: '/events',
+      name: 'event',
+      component: () => import('@/views/EventView.vue'),
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('@/views/AboutView.vue'),
+    },
 
     // Route untuk halaman login
     {
@@ -47,6 +57,26 @@ const router = createRouter({
           name: 'dashboard-events',
           component: () => import('@/views/Dashboard/DashboardEvent.vue'),
           meta: { allowedRoles: ['admin'] }, // Hanya admin yang bisa mengakses
+        },
+
+        // Route untuk CRUD Menu Events
+        {
+          path: 'crud-menu/addevent',
+          name: 'add-event',
+          component: () => import('@/views/Dashboard/CRUD-Menu/AddEvent.vue'),
+          meta: { allowedRoles: ['admin'] },
+        },
+        {
+          path: 'crud-menu/editevent/:eventId',
+          name: 'edit-event',
+          component: () => import('@/views/Dashboard/CRUD-Menu/AddEvent.vue'),
+          meta: { allowedRoles: ['admin'] },
+        },
+        {
+          path: 'crud-menu/eventview',
+          name: 'event-view',
+          component: () => import('@/views/Dashboard/CRUD-Menu/EventView.vue'),
+          meta: { allowedRoles: ['admin'] },
         },
 
         // Route untuk manajemen teams (admin dan coach bisa mengakses)
