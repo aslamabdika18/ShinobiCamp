@@ -6,13 +6,34 @@
       <!-- Left Column: Main Information -->
       <div class="space-y-4">
         <FormInput v-model="form.name" label="Event Name" required />
-        <FormInput v-model="form.poster" label="Poster URL" required />
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Poster</label>
+          <input
+            type="file"
+            @change="handleFileUpload($event, 'poster')"
+            class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div v-if="form.poster && typeof form.poster === 'string'" class="mt-2">
+            <img :src="form.poster" alt="Current poster" class="h-24 object-contain" />
+            <p class="text-xs text-gray-500">Current poster</p>
+          </div>
+        </div>
         <FormTextarea v-model="form.description" label="Description" required />
       </div>
 
       <!-- Right Column: Additional Information -->
       <div class="space-y-4">
-        <FormInput v-model="form.proposal" label="Proposal" required />
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Proposal</label>
+          <input
+            type="file"
+            @change="handleFileUpload($event, 'proposal')"
+            class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div v-if="form.proposal && typeof form.proposal === 'string'" class="mt-2">
+            <p class="text-xs text-gray-500">Current proposal: {{ form.proposal }}</p>
+          </div>
+        </div>
         <FormInput v-model="form.location" label="Location" required />
         <FormInput v-model="form.first_event_date" label="First Event Date" type="date" required />
         <FormInput v-model="form.last_event_date" label="Last Event Date" type="date" required />
@@ -43,12 +64,14 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useEventStore } from '@/stores/eventStore'
 import FormInput from '@/views/Dashboard/components/FormInput.vue'
 import FormTextarea from '@/views/Dashboard/components/FormTextarea.vue'
 import FormSelect from '@/views/Dashboard/components/FormSelect.vue'
 
 const route = useRoute()
 const router = useRouter()
+const eventStore = useEventStore()
 
 const form = ref({
   id: null,
@@ -63,6 +86,14 @@ const form = ref({
   status: 'Aktif',
 })
 
+// Handle file uploads
+const handleFileUpload = (event, fieldName) => {
+  const file = event.target.files[0]
+  if (file) {
+    form.value[fieldName] = file
+  }
+}
+
 const statusOptions = [
   { value: 'Aktif', label: 'Aktif' },
   { value: 'Nonaktif', label: 'Nonaktif' },
@@ -75,9 +106,18 @@ const isLoading = ref(false)
 if (isEditing.value) {
   const fetchEventData = async () => {
     try {
-      const response = await fetch(`/api/events/${route.params.eventId}`)
-      const eventData = await response.json()
-      form.value = { ...eventData }
+      await eventStore.fetchEvent(route.params.eventId)
+      const eventData = eventStore.currentEvent
+
+      // Copy event data to form
+      Object.keys(form.value).forEach(key => {
+        if (eventData[key] !== undefined) {
+          form.value[key] = eventData[key]
+        }
+      })
+
+      // Set ID separately
+      form.value.id = eventData.id
     } catch (error) {
       console.error('Error fetching event data:', error)
     }
@@ -90,10 +130,10 @@ const submitForm = async () => {
   isLoading.value = true
   try {
     if (isEditing.value) {
-      await updateEvent(form.value)
+      await eventStore.updateEvent(form.value.id, form.value)
       alert('Event berhasil diupdate!')
     } else {
-      await createEvent(form.value)
+      await eventStore.createEvent(form.value)
       alert('Event berhasil ditambahkan!')
     }
     router.push('/dashboard/events')
@@ -103,34 +143,5 @@ const submitForm = async () => {
   } finally {
     isLoading.value = false
   }
-}
-
-// Implementasi fungsi API
-async function updateEvent(eventData) {
-  const response = await fetch(`/api/events/${eventData.id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(eventData),
-  })
-  if (!response.ok) {
-    throw new Error('Gagal mengupdate event')
-  }
-  return await response.json()
-}
-
-async function createEvent(eventData) {
-  const response = await fetch('/api/events', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(eventData),
-  })
-  if (!response.ok) {
-    throw new Error('Gagal menambahkan event')
-  }
-  return await response.json()
 }
 </script>
