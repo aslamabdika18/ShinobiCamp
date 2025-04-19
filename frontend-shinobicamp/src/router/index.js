@@ -42,7 +42,7 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/views/Dashboard/DashboardView.vue'),
-      meta: { requiresAuth: true, allowedRoles: ['admin', 'coach'] }, // Hanya admin dan coach yang bisa mengakses
+      meta: { requiresAuth: true, allowedRoles: ['superadmin','admin', 'coach'] }, // Hanya admin dan coach yang bisa mengakses
       children: [
         // Route default untuk dashboard (halaman utama dashboard)
         {
@@ -56,7 +56,7 @@ const router = createRouter({
           path: 'events',
           name: 'dashboard-events',
           component: () => import('@/views/Dashboard/DashboardEvent.vue'),
-          meta: { allowedRoles: ['admin'] }, // Hanya admin yang bisa mengakses
+          meta: { allowedRoles: ['superadmin','admin'] }, // Hanya admin yang bisa mengakses
         },
 
         // Route untuk CRUD Menu Events
@@ -64,19 +64,19 @@ const router = createRouter({
           path: 'crud-menu/addevent',
           name: 'add-event',
           component: () => import('@/views/Dashboard/CRUD-Menu/AddEvent.vue'),
-          meta: { allowedRoles: ['admin'] },
+          meta: { allowedRoles: ['superadmin','admin'] },
         },
         {
           path: 'crud-menu/editevent/:eventId',
           name: 'edit-event',
           component: () => import('@/views/Dashboard/CRUD-Menu/AddEvent.vue'),
-          meta: { allowedRoles: ['admin'] },
+          meta: { allowedRoles: ['superadmin','admin'] },
         },
         {
           path: 'crud-menu/eventview',
           name: 'event-view',
           component: () => import('@/views/Dashboard/CRUD-Menu/EventView.vue'),
-          meta: { allowedRoles: ['admin'] },
+          meta: { allowedRoles: ['superadmin','admin'] },
         },
 
         // Route untuk manajemen teams (admin dan coach bisa mengakses)
@@ -84,7 +84,7 @@ const router = createRouter({
           path: 'teams',
           name: 'dashboard-teams',
           component: () => import('@/views/Dashboard/DashboardTeam.vue'),
-          meta: { allowedRoles: ['admin', 'coach'] }, // Admin dan coach bisa mengakses
+          meta: { allowedRoles: ['superadmin','admin', 'coach'] }, // Admin dan coach bisa mengakses
         },
 
         // Route untuk manajemen coaches (admin dan coach bisa mengakses)
@@ -92,7 +92,7 @@ const router = createRouter({
           path: 'coaches',
           name: 'dashboard-coaches',
           component: () => import('@/views/Dashboard/DashboardCoaches.vue'),
-          meta: { allowedRoles: ['admin', 'coach'] }, // Admin dan coach bisa mengakses
+          meta: { allowedRoles: ['superadmin','admin', 'coach'] }, // Admin dan coach bisa mengakses
         },
 
         // Route untuk manajemen atlet (admin dan coach bisa mengakses)
@@ -100,7 +100,7 @@ const router = createRouter({
           path: 'atlets',
           name: 'dashboard-atlets',
           component: () => import('@/views/Dashboard/DashboardAtlet.vue'),
-          meta: { allowedRoles: ['admin', 'coach'] }, // Admin dan coach bisa mengakses
+          meta: { allowedRoles: ['superadmin','admin', 'coach'] }, // Admin dan coach bisa mengakses
         },
 
         // Route untuk manajemen pembayaran (admin dan coach bisa mengakses)
@@ -108,7 +108,7 @@ const router = createRouter({
           path: 'payments',
           name: 'dashboard-payments',
           component: () => import('@/views/Dashboard/DashboardPayment.vue'),
-          meta: { allowedRoles: ['admin', 'coach'] }, // Admin dan coach bisa mengakses
+          meta: { allowedRoles: ['superadmin','admin', 'coach'] }, // Admin dan coach bisa mengakses
         },
 
         // Route untuk manajemen classcamp (hanya admin yang bisa mengakses)
@@ -116,7 +116,7 @@ const router = createRouter({
           path: 'classcamp',
           name: 'dashboard-classcamp',
           component: () => import('@/views/Dashboard/DashboardClasscamp.vue'),
-          meta: { allowedRoles: ['admin'] }, // Hanya admin yang bisa mengakses
+          meta: { allowedRoles: ['superadmin','admin'] }, // Hanya admin yang bisa mengakses
         },
 
         // Route untuk manajemen categories (hanya admin yang bisa mengakses)
@@ -124,7 +124,7 @@ const router = createRouter({
           path: 'categories',
           name: 'dashboard-categories',
           component: () => import('@/views/Dashboard/DashboardCategories.vue'),
-          meta: { allowedRoles: ['admin'] }, // Hanya admin yang bisa mengakses
+          meta: { allowedRoles: ['superadmin','admin'] }, // Hanya admin yang bisa mengakses
         },
 
         // Route untuk manajemen brackets (hanya admin yang bisa mengakses)
@@ -132,7 +132,7 @@ const router = createRouter({
           path: 'brackets',
           name: 'dashboard-brackets',
           component: () => import('@/views/Dashboard/DashboardBracket.vue'),
-          meta: { allowedRoles: ['admin'] }, // Hanya admin yang bisa mengakses
+          meta: { allowedRoles: ['superadmin','admin'] }, // Hanya admin yang bisa mengakses
         },
 
         // Route untuk manajemen schedules (hanya admin yang bisa mengakses)
@@ -140,7 +140,7 @@ const router = createRouter({
           path: 'schedules',
           name: 'dashboard-schedules',
           component: () => import('@/views/Dashboard/DashboardSchedule.vue'),
-          meta: { allowedRoles: ['admin'] }, // Hanya admin yang bisa mengakses
+          meta: { allowedRoles: ['superadmin','admin'] }, // Hanya admin yang bisa mengakses
         },
 
         // Route untuk CRUD event (hanya admin yang bisa mengakses)
@@ -148,7 +148,7 @@ const router = createRouter({
           path: 'crud-menu/addevent/:eventId?',
           name: 'dashboard-crud-addevent',
           component: () => import('@/views/Dashboard/CRUD-Menu/AddEvent.vue'),
-          meta: { allowedRoles: ['admin'] }, // Hanya admin yang bisa mengakses
+          meta: { allowedRoles: ['superadmin','admin'] }, // Hanya admin yang bisa mengakses
         },
       ],
     },

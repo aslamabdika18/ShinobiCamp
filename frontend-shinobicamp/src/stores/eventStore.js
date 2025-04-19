@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import EventService from '@/API/eventService';
+import { useAuthStore } from '@/stores/authStore';
 
 export const useEventStore = defineStore('event', () => {
   // State
@@ -8,6 +9,14 @@ export const useEventStore = defineStore('event', () => {
   const currentEvent = ref(null);
   const isLoading = ref(false);
   const error = ref(null);
+
+  // Pagination state
+  const pagination = ref({
+    currentPage: 1,
+    totalPages: 0,
+    perPage: 9,
+    total: 0
+  });
 
   // Getters
   const getEventById = computed(() => {
@@ -24,8 +33,38 @@ export const useEventStore = defineStore('event', () => {
     error.value = null;
 
     try {
-      const response = await EventService.getEvents(params);
-      events.value = response.data;
+      // Tambahkan parameter paginasi jika tidak ada
+      const paginationParams = {
+        page: params.page || pagination.value.currentPage,
+        per_page: params.per_page || pagination.value.perPage,
+        ...params
+      };
+
+      // Cek status autentikasi menggunakan authStore
+      const authStore = useAuthStore();
+      let response;
+
+      if (authStore.isAuthenticated) {
+        // Gunakan endpoint yang memerlukan autentikasi
+        response = await EventService.getEvents(paginationParams);
+      } else {
+        // Gunakan endpoint publik jika tidak ada autentikasi
+        response = await EventService.getPublicEvents(paginationParams);
+      }
+
+      // Menyesuaikan dengan struktur respons API yang mengembalikan data dalam format collection
+      events.value = response.data.data || response.data;
+
+      // Update pagination state jika response memiliki meta pagination
+      if (response.data.meta) {
+        pagination.value = {
+          currentPage: response.data.meta.current_page,
+          totalPages: response.data.meta.last_page,
+          perPage: response.data.meta.per_page,
+          total: response.data.meta.total
+        };
+      }
+
       return response;
     } catch (err) {
       error.value = err.message || 'Failed to fetch events';
@@ -144,6 +183,17 @@ export const useEventStore = defineStore('event', () => {
     currentEvent.value = null;
     isLoading.value = false;
     error.value = null;
+    pagination.value = {
+      currentPage: 1,
+      totalPages: 0,
+      perPage: 9,
+      total: 0
+    };
+  };
+
+  const changePage = async (page) => {
+    pagination.value.currentPage = page;
+    return await fetchEvents({ page });
   };
 
   return {
@@ -152,6 +202,7 @@ export const useEventStore = defineStore('event', () => {
     currentEvent,
     isLoading,
     error,
+    pagination,
 
     // Getters
     getEventById,
@@ -163,6 +214,7 @@ export const useEventStore = defineStore('event', () => {
     createEvent,
     updateEvent,
     deleteEvent,
-    resetState
+    resetState,
+    changePage
   };
 });

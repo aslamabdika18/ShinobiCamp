@@ -11,14 +11,32 @@ const apiClient = axios.create({
   }
 });
 
+// Create public API client (doesn't require authentication)
+const publicApiClient = axios.create({
+  baseURL: 'http://localhost:8000/api',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+});
+
 const EventService = {
   /**
-   * Get all events with optional pagination
+   * Get all events with optional pagination (requires authentication)
    * @param {Object} params - Query parameters
    * @returns {Promise} - Axios response
    */
   getEvents(params = {}) {
     return apiClient.get('/events', { params });
+  },
+
+  /**
+   * Get all events from public endpoint (no authentication required)
+   * @param {Object} params - Query parameters
+   * @returns {Promise} - Axios response
+   */
+  getPublicEvents(params = {}) {
+    return publicApiClient.get('/public/events', { params });
   },
 
   /**
