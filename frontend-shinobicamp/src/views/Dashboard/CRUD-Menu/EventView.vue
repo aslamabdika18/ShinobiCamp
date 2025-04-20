@@ -8,11 +8,24 @@
       >
         Tambah Event
       </router-link>
+      <router-link
+        to="/dashboard/events"
+        class="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
+      >
+        Kembali
+      </router-link>
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="text-center py-8">
-      <p>Loading...</p>
+    <div v-if="isLoading" class="py-6">
+      <div class="flex justify-center items-center mb-6">
+        <div class="relative">
+          <div class="h-12 w-12 rounded-full border-t-4 border-b-4 border-blue-500 animate-spin"></div>
+          <div class="absolute top-0 right-0 h-12 w-12 rounded-full border-r-4 border-l-4 border-blue-300 animate-ping opacity-60"></div>
+        </div>
+        <p class="ml-3 text-lg font-medium text-gray-700">Loading events...</p>
+      </div>
+      <SkeletonLoader :count="6" />
     </div>
 
     <!-- Error State -->
@@ -63,6 +76,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useEventStore } from '@/stores/eventStore'
+import SkeletonLoader from '@/components/ui/SkeletonLoader.vue'
+import { toast } from 'vue3-toastify'
 
 const eventStore = useEventStore()
 const isDeleting = ref(null)
@@ -110,9 +125,10 @@ const deleteEvent = async (eventId) => {
   isDeleting.value = eventId
   try {
     await eventStore.deleteEvent(eventId)
+    toast.success('Event berhasil dihapus!')
   } catch (err) {
     console.error('Error deleting event:', err)
-    alert('Gagal menghapus event. Silakan coba lagi.')
+    toast.error('Gagal menghapus event. Silakan coba lagi.')
   } finally {
     isDeleting.value = null
   }

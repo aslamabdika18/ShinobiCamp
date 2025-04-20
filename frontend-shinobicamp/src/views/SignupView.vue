@@ -58,6 +58,7 @@ import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import FormInput from '@/components/FormInput.vue';
+import { toast } from 'vue3-toastify';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -87,6 +88,7 @@ const submitForm = async () => {
   try {
     await authStore.register(form);
     // Tampilkan pesan sukses
+    toast.success('Registrasi berhasil! Silakan login dengan kredensial Anda.', { autoClose: 5000 });
     successMessage.value = 'Registration successful! Please login with your credentials.';
 
     // Kosongkan form

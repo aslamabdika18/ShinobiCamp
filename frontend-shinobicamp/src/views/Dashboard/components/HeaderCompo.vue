@@ -62,9 +62,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { toast } from 'vue3-toastify'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -78,21 +79,58 @@ const user = computed(() => auth.currentUser)
 // Fungsi untuk toggle dropdown
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
+
+  // Tambahkan event listener untuk click outside saat dropdown terbuka
+  if (isDropdownOpen.value) {
+    setTimeout(() => {
+      window.addEventListener('click', handleClickOutside)
+    }, 0)
+  }
 }
 
 // Fungsi untuk menutup dropdown
 const closeDropdown = () => {
   isDropdownOpen.value = false
+  window.removeEventListener('click', handleClickOutside)
 }
+
+// Fungsi untuk menangani click outside dropdown
+const handleClickOutside = (event) => {
+  const dropdown = document.querySelector('.relative')
+  if (dropdown && !dropdown.contains(event.target)) {
+    closeDropdown()
+  }
+}
+
+// Bersihkan event listener saat komponen di-unmount
+onBeforeUnmount(() => {
+  window.removeEventListener('click', handleClickOutside)
+})
 
 // Fungsi untuk logout
 const logout = async () => {
-  const logoutError = await auth.logout();
-  if (!logoutError) {
-    router.push({ name: 'home' }); // Redirect ke home jika logout berhasil
-  } else {
-    console.error('Logout failed:', logoutError);
-    // Tambahkan notifikasi atau feedback ke pengguna jika diperlukan
+  try {
+    // Tutup dropdown sebelum logout untuk mencegah event listener yang tertinggal
+    closeDropdown();
+
+    await auth.logout();
+    // Tampilkan toast dan tunggu sebelum navigasi untuk mencegah runtime.lastError
+    toast.success('Logout berhasil!', {
+      autoClose: 3000,
+      onClose: () => {
+        // Navigasi setelah toast ditutup dengan delay kecil untuk memastikan toast sudah ditutup
+        setTimeout(() => {
+          router.push({ name: 'home' });
+        }, 100);
+      }
+    });
+    // Tutup dropdown setelah logout
+    closeDropdown();
+  } catch (error) {
+    console.error('Logout failed:', error);
+    toast.error('Logout gagal. Silakan coba lagi.', {
+      autoClose: 3000
+    });
   }
 };
 // Dapatkan route saat ini

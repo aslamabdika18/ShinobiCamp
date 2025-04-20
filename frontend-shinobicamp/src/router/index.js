@@ -170,8 +170,17 @@ const router = createRouter({
 })
 
 // Navigation guard untuk memeriksa autentikasi dan role
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+
+  // Jika autentikasi belum diselesaikan, tunggu sampai selesai
+  if (!authStore.isAuthResolved) {
+    try {
+      await authStore.attempt()
+    } catch (error) {
+      console.error('Authentication check failed:', error)
+    }
+  }
 
   // Periksa apakah route memerlukan autentikasi
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
@@ -185,8 +194,15 @@ router.beforeEach((to, from, next) => {
     return
   }
 
+  // Jika mencoba mengakses halaman login/register saat sudah login, redirect ke dashboard
+  if ((to.name === 'signin' || to.name === 'signup') && authStore.isAuthenticated) {
+    next('/dashboard') // Redirect ke dashboard jika sudah login
+    return
+  }
+
   // Lanjutkan navigasi
   next()
 })
+
 
 export default router

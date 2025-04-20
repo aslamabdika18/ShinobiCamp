@@ -37,19 +37,24 @@ export const useEventStore = defineStore('event', () => {
       const paginationParams = {
         page: params.page || pagination.value.currentPage,
         per_page: params.per_page || pagination.value.perPage,
-        ...params
       };
 
       // Cek status autentikasi menggunakan authStore
       const authStore = useAuthStore();
       let response;
 
-      if (authStore.isAuthenticated) {
-        // Gunakan endpoint yang memerlukan autentikasi
-        response = await EventService.getEvents(paginationParams);
-      } else {
-        // Gunakan endpoint publik jika tidak ada autentikasi
-        response = await EventService.getPublicEvents(paginationParams);
+      try {
+        if (authStore.isAuthenticated) {
+          // Gunakan endpoint yang memerlukan autentikasi
+          response = await EventService.getEvents(paginationParams);
+        } else {
+          // Gunakan endpoint publik jika tidak ada autentikasi
+          response = await EventService.getPublicEvents(paginationParams);
+        }
+      } catch (apiError) {
+        console.error('API Error:', apiError);
+        error.value = apiError.response?.data?.message || 'Terjadi kesalahan saat mengambil data event';
+        throw apiError;
       }
 
       // Menyesuaikan dengan struktur respons API yang mengembalikan data dalam format collection

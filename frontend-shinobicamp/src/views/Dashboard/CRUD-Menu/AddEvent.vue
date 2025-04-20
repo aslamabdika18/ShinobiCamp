@@ -11,6 +11,7 @@
           <input
             type="file"
             @change="handleFileUpload($event, 'poster')"
+            accept=".jpg,.jpeg,.png,.gif,image/jpeg,image/jpg,image/png,image/gif"
             class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <div v-if="form.poster && typeof form.poster === 'string'" class="mt-2">
@@ -28,6 +29,7 @@
           <input
             type="file"
             @change="handleFileUpload($event, 'proposal')"
+            accept=".pdf,application/pdf"
             class="mt-1 w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <div v-if="form.proposal && typeof form.proposal === 'string'" class="mt-2">
@@ -38,7 +40,7 @@
         <FormInput v-model="form.first_event_date" label="First Event Date" type="date" required />
         <FormInput v-model="form.last_event_date" label="Last Event Date" type="date" required />
         <FormInput v-model="form.registration_deadline" label="Register Deadline" type="date" required />
-        <FormSelect v-model="form.status" label="Status" :options="statusOptions" required />
+        <FormSelect v-model="form.is_active" label="Status" :options="statusOptions" required />
       </div>
 
       <!-- Action Buttons -->
@@ -65,6 +67,7 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useEventStore } from '@/stores/eventStore'
+import { toast } from 'vue3-toastify'
 import FormInput from '@/views/Dashboard/components/FormInput.vue'
 import FormTextarea from '@/views/Dashboard/components/FormTextarea.vue'
 import FormSelect from '@/views/Dashboard/components/FormSelect.vue'
@@ -83,20 +86,35 @@ const form = ref({
   first_event_date: new Date().toISOString().split('T')[0],
   last_event_date: new Date().toISOString().split('T')[0],
   registration_deadline: new Date().toISOString().split('T')[0],
-  status: 'Aktif',
+  is_active: true,
 })
 
 // Handle file uploads
 const handleFileUpload = (event, fieldName) => {
   const file = event.target.files[0]
   if (file) {
+    // Validasi format file
+    if (fieldName === 'poster') {
+      const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+      if (!validImageTypes.includes(file.type)) {
+        toast.error('Poster harus berupa file gambar (JPG, JPEG, PNG, GIF)')
+        event.target.value = '' // Reset input file
+        return
+      }
+    } else if (fieldName === 'proposal') {
+      if (file.type !== 'application/pdf') {
+        toast.error('Proposal harus berupa file PDF')
+        event.target.value = '' // Reset input file
+        return
+      }
+    }
     form.value[fieldName] = file
   }
 }
 
 const statusOptions = [
-  { value: 'Aktif', label: 'Aktif' },
-  { value: 'Nonaktif', label: 'Nonaktif' },
+  { value: true, label: 'Aktif' },
+  { value: false, label: 'Nonaktif' },
 ]
 
 const isEditing = computed(() => !!route.params.eventId)
@@ -127,19 +145,35 @@ if (isEditing.value) {
 
 // Submit form (create or update)
 const submitForm = async () => {
+  // Validasi file sebelum submit
+  if (form.value.poster instanceof File) {
+    const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+    if (!validImageTypes.includes(form.value.poster.type)) {
+      toast.error('Poster harus berupa file gambar (JPG, JPEG, PNG, GIF)')
+      return
+    }
+  }
+
+  if (form.value.proposal instanceof File) {
+    if (form.value.proposal.type !== 'application/pdf') {
+      toast.error('Proposal harus berupa file PDF')
+      return
+    }
+  }
+
   isLoading.value = true
   try {
     if (isEditing.value) {
       await eventStore.updateEvent(form.value.id, form.value)
-      alert('Event berhasil diupdate!')
+      toast.success('Event berhasil diupdate!')
     } else {
       await eventStore.createEvent(form.value)
-      alert('Event berhasil ditambahkan!')
+      toast.success('Event berhasil ditambahkan!')
     }
-    router.push('/dashboard/events')
+    router.push('/dashboard/crud-menu/eventview')
   } catch (error) {
     console.error('Error submitting form:', error)
-    alert('Terjadi kesalahan. Silakan coba lagi.')
+    toast.error('Terjadi kesalahan. Silakan coba lagi.')
   } finally {
     isLoading.value = false
   }

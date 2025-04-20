@@ -7,11 +7,15 @@ import { createPinia } from 'pinia';
 import axios from 'axios';
 import App from './App.vue';
 import router from './router';
-import { useAuthStore } from './stores/authStore';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { far } from '@fortawesome/free-regular-svg-icons';
+import Vue3Toastify, { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
+// Import Axios Config
+import './API/axiosConfig';
 
 // Axios Configuration
 axios.defaults.baseURL = 'http://localhost:8000';
@@ -25,6 +29,19 @@ library.add(fas, far);
 const app = createApp(App)
   .use(createPinia())
   .use(router)
+  .use(Vue3Toastify, {
+    autoClose: 3000,
+    position: toast.POSITION.TOP_RIGHT,
+    clearOnUrlChange: true,
+    pauseOnHover: true,
+    theme: 'colored'
+  })
   .component('font-awesome-icon', FontAwesomeIcon);
 
-useAuthStore().attempt().finally(() => app.mount('#app'));
+// Cek autentikasi dan mount aplikasi
+const pinia = createPinia();
+app.use(pinia);
+
+// Mount aplikasi langsung tanpa menunggu attempt()
+// Router guard akan menangani pemeriksaan autentikasi
+app.mount('#app');

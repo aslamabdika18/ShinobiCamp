@@ -41,6 +41,7 @@ import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import FormInput from '@/components/FormInput.vue';
+import { toast } from 'vue3-toastify';
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -59,6 +60,7 @@ const submitForm = async () => {
     loading.value = true;
 
     await auth.login(formData);
+    toast.success('Login berhasil!', { autoClose: 5000 });
     router.push({ name: 'dashboard' });
   } catch (error) {
     loginError.value = error.response?.data?.message || error.message || 'Login failed';

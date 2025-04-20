@@ -32,6 +32,15 @@
         }"
       />
     </div>
+
+    <!-- Pagination Controls -->
+    <div class="mt-8 flex justify-center">
+      <LaravelVuePagination
+        :data="eventStore.pagination"
+        @pagination-change-page="handlePageChange"
+        :limit="2"
+      />
+    </div>
   </div>
 </template>
 
@@ -40,6 +49,7 @@
 import EventCard from '@/components/EventCard.vue'
 import { useEventStore } from '@/stores/eventStore'
 import { ref, onMounted, computed } from 'vue'
+import { LaravelVuePagination } from 'laravel-vue-pagination'
 
 // Inisialisasi event store
 const eventStore = useEventStore()
@@ -61,16 +71,21 @@ const formatDate = (dateString) => {
 }
 
 // Mengambil data event dari API
-const fetchEvents = async () => {
+const fetchEvents = async (page = 1) => {
   isLoading.value = true
   try {
-    await eventStore.fetchEvents()
+    await eventStore.fetchEvents({ page })
   } catch (err) {
     console.error('Error fetching events:', err)
     error.value = 'Gagal memuat data event. Silakan coba lagi.'
   } finally {
     isLoading.value = false
   }
+}
+
+// Handle page change from pagination component
+const handlePageChange = (page) => {
+  fetchEvents(page)
 }
 
 // Fetch events saat komponen dimuat

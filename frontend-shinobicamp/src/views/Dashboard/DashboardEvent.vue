@@ -12,11 +12,15 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex justify-center items-center py-12">
-      <div class="text-center">
-        <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-3xl text-blue-500 mb-2" />
-        <p>Memuat events...</p>
+    <div v-if="isLoading" class="py-6">
+      <div class="flex justify-center items-center mb-6">
+        <div class="relative">
+          <div class="h-12 w-12 rounded-full border-t-4 border-b-4 border-blue-500 animate-spin"></div>
+          <div class="absolute top-0 right-0 h-12 w-12 rounded-full border-r-4 border-l-4 border-blue-300 animate-ping opacity-60"></div>
+        </div>
+        <p class="ml-3 text-lg font-medium text-gray-700">Memuat events...</p>
       </div>
+      <SkeletonLoader :count="3" />
     </div>
 
     <!-- Error State -->
@@ -212,6 +216,20 @@
           </div>
         </div>
       </div>
+
+      <!-- Pagination Controls -->
+      <div class="mt-6 flex justify-center" v-if="eventStore.pagination && (eventStore.pagination.last_page > 1 || eventStore.pagination.totalPages > 1)">
+        <Bootstrap5Pagination
+          :data="{
+            current_page: eventStore.pagination.currentPage || 1,
+            last_page: eventStore.pagination.totalPages || eventStore.pagination.last_page || 1,
+            per_page: eventStore.pagination.perPage,
+            total: eventStore.pagination.total
+          }"
+          @pagination-change-page="handlePageChange"
+          :limit="2"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -219,6 +237,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useEventStore } from '@/stores/eventStore'
+import { Bootstrap5Pagination } from 'laravel-vue-pagination'
+import { toast } from 'vue3-toastify'
+import SkeletonLoader from '@/components/ui/SkeletonLoader.vue'
 
 // Initialize event store
 const eventStore = useEventStore()
@@ -229,7 +250,7 @@ const detailEvent = ref({})
 const deletingId = ref(null)
 
 // Computed properties untuk mengakses state dari store
-const events = computed(() => eventStore.events)
+const events = computed(() => eventStore.events || [])
 const isLoading = computed(() => eventStore.isLoading)
 const error = computed(() => eventStore.error)
 
@@ -250,12 +271,17 @@ const formatDate = (dateString) => {
 }
 
 // Load events from the API
-const loadEvents = async () => {
+const loadEvents = async (page = 1) => {
   try {
-    await eventStore.fetchEvents()
+    await eventStore.fetchEvents({ page })
   } catch (err) {
     console.error('Failed to load events:', err)
   }
+}
+
+// Handle page change from pagination component
+const handlePageChange = (page) => {
+  loadEvents(page)
 }
 
 // Show event details in modal
@@ -276,9 +302,12 @@ const confirmDelete = async (id) => {
   try {
     deletingId.value = id
     await eventStore.deleteEvent(id)
+    // Refresh the events after deletion
+    await loadEvents(eventStore.pagination?.currentPage || 1)
+    toast.success('Event berhasil dihapus!')
   } catch (err) {
     console.error('Failed to delete event:', err)
-    alert('Gagal menghapus event. Silakan coba lagi.')
+    toast.error('Gagal menghapus event. Silakan coba lagi.')
   } finally {
     deletingId.value = null
   }

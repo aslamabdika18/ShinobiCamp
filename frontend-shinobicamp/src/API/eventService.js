@@ -1,24 +1,5 @@
-import axios from 'axios';
+import { apiClient, publicApiClient } from './axiosConfig';
 
-// Create axios instance with base URL from environment variables
-const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api',
-  withCredentials: true,
-  withXSRFToken: true,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
-
-// Create public API client (doesn't require authentication)
-const publicApiClient = axios.create({
-  baseURL: 'http://localhost:8000/api',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
 
 const EventService = {
   /**

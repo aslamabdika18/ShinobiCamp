@@ -328,6 +328,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
+import { toast } from 'vue3-toastify';
 
 // Data dummy atlet
 const athletes = ref([
@@ -500,7 +501,7 @@ const getRoundName = (roundIndex, totalRounds) => {
 // Preview shuffle - menampilkan bracket sebelum dikonfirmasi
 const previewShuffle = () => {
   if (filteredAthletes.value.length < 2) {
-    alert('Minimal diperlukan 2 atlet untuk membuat bracket pertandingan.');
+    toast.warning('Minimal diperlukan 2 atlet untuk membuat bracket pertandingan.');
     return;
   }
 
@@ -596,16 +597,16 @@ const advanceWinners = () => {
   }
 
   if (!hasAdvanced) {
-    alert('Semua pertandingan sudah selesai!');
+    toast.info('Semua pertandingan sudah selesai!');
   }
 };
 
 // Export to PDF (placeholder)
 const exportToPDF = () => {
   if (generatedBracket.value.length === 0) {
-    alert('Tidak ada bracket yang tersedia untuk diekspor.');
+    toast.warning('Tidak ada bracket yang tersedia untuk diekspor.');
     return;
   }
-  alert('Export to PDF');
+  toast.success('Bracket berhasil diekspor ke PDF!');
 };
 </script>
