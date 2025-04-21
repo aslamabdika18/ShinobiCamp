@@ -53,7 +53,16 @@ export const useEventStore = defineStore('event', () => {
         }
       } catch (apiError) {
         console.error('API Error:', apiError);
-        error.value = apiError.response?.data?.message || 'Terjadi kesalahan saat mengambil data event';
+        if (apiError.response) {
+          // Jika ada response dari server
+          error.value = apiError.response.data?.message || `Error ${apiError.response.status}: ${apiError.response.statusText}`;
+        } else if (apiError.request) {
+          // Jika request dibuat tapi tidak ada response (network error)
+          error.value = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+        } else {
+          // Error lainnya
+          error.value = apiError.message || 'Terjadi kesalahan saat mengambil data event';
+        }
         throw apiError;
       }
 
@@ -88,7 +97,16 @@ export const useEventStore = defineStore('event', () => {
       currentEvent.value = response.data;
       return response;
     } catch (err) {
-      error.value = err.message || `Failed to fetch event with id ${id}`;
+      if (err.response) {
+        // Jika ada response dari server
+        error.value = err.response.data?.message || `Error ${err.response.status}: ${err.response.statusText}`;
+      } else if (err.request) {
+        // Jika request dibuat tapi tidak ada response (network error)
+        error.value = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+      } else {
+        // Error lainnya
+        error.value = err.message || `Gagal mengambil data event dengan id ${id}`;
+      }
       throw err;
     } finally {
       isLoading.value = false;
@@ -118,7 +136,16 @@ export const useEventStore = defineStore('event', () => {
       events.value.push(response.data);
       return response;
     } catch (err) {
-      error.value = err.message || 'Failed to create event';
+      if (err.response) {
+        // Jika ada response dari server
+        error.value = err.response.data?.message || `Error ${err.response.status}: ${err.response.statusText}`;
+      } else if (err.request) {
+        // Jika request dibuat tapi tidak ada response (network error)
+        error.value = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+      } else {
+        // Error lainnya
+        error.value = err.message || 'Gagal membuat event baru';
+      }
       throw err;
     } finally {
       isLoading.value = false;
@@ -157,7 +184,16 @@ export const useEventStore = defineStore('event', () => {
 
       return response;
     } catch (err) {
-      error.value = err.message || `Failed to update event with id ${id}`;
+      if (err.response) {
+        // Jika ada response dari server
+        error.value = err.response.data?.message || `Error ${err.response.status}: ${err.response.statusText}`;
+      } else if (err.request) {
+        // Jika request dibuat tapi tidak ada response (network error)
+        error.value = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+      } else {
+        // Error lainnya
+        error.value = err.message || `Gagal memperbarui event dengan id ${id}`;
+      }
       throw err;
     } finally {
       isLoading.value = false;
@@ -176,7 +212,16 @@ export const useEventStore = defineStore('event', () => {
 
       return response;
     } catch (err) {
-      error.value = err.message || `Failed to delete event with id ${id}`;
+      if (err.response) {
+        // Jika ada response dari server
+        error.value = err.response.data?.message || `Error ${err.response.status}: ${err.response.statusText}`;
+      } else if (err.request) {
+        // Jika request dibuat tapi tidak ada response (network error)
+        error.value = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.';
+      } else {
+        // Error lainnya
+        error.value = err.message || `Gagal menghapus event dengan id ${id}`;
+      }
       throw err;
     } finally {
       isLoading.value = false;

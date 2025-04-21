@@ -11,8 +11,9 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { far } from '@fortawesome/free-regular-svg-icons';
-import Vue3Toastify, { toast } from 'vue3-toastify';
+import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import Vue3Toastify from 'vue3-toastify';
 
 // Import Axios Config
 import './API/axiosConfig';
@@ -34,7 +35,19 @@ const app = createApp(App)
     position: toast.POSITION.TOP_RIGHT,
     clearOnUrlChange: true,
     pauseOnHover: true,
-    theme: 'colored'
+    theme: 'colored',
+    transition: 'slide',
+    dangerouslyHTMLString: false,
+    limit: 3,
+    hideProgressBar: false,
+    closeButton: true,
+    closeOnClick: true,
+    className: 'custom-toast',
+    style: {
+      minWidth: '250px',
+      maxWidth: '90vw',
+      wordBreak: 'break-word'
+    }
   })
   .component('font-awesome-icon', FontAwesomeIcon);
 

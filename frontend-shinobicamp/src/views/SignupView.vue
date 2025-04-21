@@ -88,7 +88,14 @@ const submitForm = async () => {
   try {
     await authStore.register(form);
     // Tampilkan pesan sukses
-    toast.success('Registrasi berhasil! Silakan login dengan kredensial Anda.', { autoClose: 5000 });
+    toast.success('Registrasi berhasil! Silakan login dengan kredensial Anda.', {
+      autoClose: 3000,
+      position: toast.POSITION.TOP_CENTER,
+      style: {
+        minWidth: '250px',
+        maxWidth: '90vw'
+      }
+    });
     successMessage.value = 'Registration successful! Please login with your credentials.';
 
     // Kosongkan form

@@ -218,13 +218,13 @@
       </div>
 
       <!-- Pagination Controls -->
-      <div class="mt-6 flex justify-center" v-if="eventStore.pagination && (eventStore.pagination.last_page > 1 || eventStore.pagination.totalPages > 1)">
+      <div class="mt-6 flex justify-center" v-if="eventStore.pagination && eventStore.pagination.total > 0">
         <Bootstrap5Pagination
           :data="{
             current_page: eventStore.pagination.currentPage || 1,
-            last_page: eventStore.pagination.totalPages || eventStore.pagination.last_page || 1,
-            per_page: eventStore.pagination.perPage,
-            total: eventStore.pagination.total
+            last_page: eventStore.pagination.totalPages || 1,
+            per_page: eventStore.pagination.perPage || 10,
+            total: eventStore.pagination.total || 0
           }"
           @pagination-change-page="handlePageChange"
           :limit="2"

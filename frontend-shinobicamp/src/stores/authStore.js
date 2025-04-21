@@ -46,6 +46,8 @@ export const useAuthStore = defineStore('auth', () => {
     await axios.get('/sanctum/csrf-cookie'); // Initialize CSRF protection
     try {
       const response = await axios.post('/register', credentials);
+      // Setelah registrasi berhasil, kita tidak perlu login otomatis
+      // Biarkan user login manual untuk memastikan kredensial benar
       return response.data;
     } catch (error) {
       if (error.response && error.response.data.errors) {
@@ -62,6 +64,8 @@ export const useAuthStore = defineStore('auth', () => {
       setUser({});
       setRoles([]); // Reset roles
       setAuthenticated(false); // Reset authentication state
+      // Pastikan semua state direset dengan benar
+      isAuthResolved.value = true;
       return null; // Return null jika berhasil
     } catch (error) {
       handleError(error, 'Logout failed. Please try again.');
@@ -72,11 +76,20 @@ export const useAuthStore = defineStore('auth', () => {
   const attempt = async () => {
     try {
       const response = await axios.get('/api/user'); // Fetch authenticated user data
-      setUser(response.data.user);
-      setRoles(response.data.roles || []); // Assume roles are included in the response
-      setAuthenticated(true);
-    } catch (error) {
-      handleError(error, 'Authentication check failed.');
+      if (response.data && response.data.user) {
+        setUser(response.data.user);
+        setRoles(response.data.roles || []); // Assume roles are included in the response
+        setAuthenticated(true);
+      } else {
+        // Jika tidak ada data user yang valid, reset state
+        setUser({});
+        setRoles([]);
+        setAuthenticated(false);
+      }
+    } catch {
+      // Jangan tampilkan error untuk pengecekan autentikasi yang gagal
+      // karena ini adalah operasi background yang normal
+      console.log('Authentication check: User not authenticated');
       setUser({});
       setRoles([]);
       setAuthenticated(false);

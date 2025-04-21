@@ -56,7 +56,7 @@
               <button
                 @click="deleteEvent(event.id)"
                 class="text-red-500 hover:text-red-700"
-                :disabled="isDeleting"
+                :disabled="isDeleting === event.id"
               >
                 {{ isDeleting === event.id ? 'Menghapus...' : 'Hapus' }}
               </button>
@@ -125,10 +125,24 @@ const deleteEvent = async (eventId) => {
   isDeleting.value = eventId
   try {
     await eventStore.deleteEvent(eventId)
-    toast.success('Event berhasil dihapus!')
+    toast.success('Event berhasil dihapus!', {
+      position: toast.POSITION.TOP_CENTER,
+      autoClose: 3000,
+      style: {
+        minWidth: '250px',
+        maxWidth: '90vw'
+      }
+    })
   } catch (err) {
     console.error('Error deleting event:', err)
-    toast.error('Gagal menghapus event. Silakan coba lagi.')
+    toast.error('Gagal menghapus event. Silakan coba lagi.', {
+      position: toast.POSITION.TOP_CENTER,
+      autoClose: 3000,
+      style: {
+        minWidth: '250px',
+        maxWidth: '90vw'
+      }
+    })
   } finally {
     isDeleting.value = null
   }

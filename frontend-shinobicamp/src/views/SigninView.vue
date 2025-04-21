@@ -60,7 +60,14 @@ const submitForm = async () => {
     loading.value = true;
 
     await auth.login(formData);
-    toast.success('Login berhasil!', { autoClose: 5000 });
+    toast.success('Login berhasil!', {
+      autoClose: 3000,
+      position: toast.POSITION.TOP_CENTER,
+      style: {
+        minWidth: '250px',
+        maxWidth: '90vw'
+      }
+    });
     router.push({ name: 'dashboard' });
   } catch (error) {
     loginError.value = error.response?.data?.message || error.message || 'Login failed';

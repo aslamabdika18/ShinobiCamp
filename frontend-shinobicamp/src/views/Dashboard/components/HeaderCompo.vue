@@ -116,7 +116,8 @@ const logout = async () => {
     await auth.logout();
     // Tampilkan toast dan tunggu sebelum navigasi untuk mencegah runtime.lastError
     toast.success('Logout berhasil!', {
-      autoClose: 3000,
+      autoClose: 2000,
+      position: toast.POSITION.TOP_CENTER,
       onClose: () => {
         // Navigasi setelah toast ditutup dengan delay kecil untuk memastikan toast sudah ditutup
         setTimeout(() => {

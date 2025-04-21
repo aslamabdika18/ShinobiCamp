@@ -149,14 +149,26 @@ const submitForm = async () => {
   if (form.value.poster instanceof File) {
     const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
     if (!validImageTypes.includes(form.value.poster.type)) {
-      toast.error('Poster harus berupa file gambar (JPG, JPEG, PNG, GIF)')
+      toast.error('Poster harus berupa file gambar (JPG, JPEG, PNG, GIF)', {
+        position: toast.POSITION.TOP_CENTER,
+        style: {
+          minWidth: '250px',
+          maxWidth: '90vw'
+        }
+      })
       return
     }
   }
 
   if (form.value.proposal instanceof File) {
     if (form.value.proposal.type !== 'application/pdf') {
-      toast.error('Proposal harus berupa file PDF')
+      toast.error('Proposal harus berupa file PDF', {
+        position: toast.POSITION.TOP_CENTER,
+        style: {
+          minWidth: '250px',
+          maxWidth: '90vw'
+        }
+      })
       return
     }
   }
@@ -165,15 +177,36 @@ const submitForm = async () => {
   try {
     if (isEditing.value) {
       await eventStore.updateEvent(form.value.id, form.value)
-      toast.success('Event berhasil diupdate!')
+      toast.success('Event berhasil diupdate!', {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 3000,
+        style: {
+          minWidth: '250px',
+          maxWidth: '90vw'
+        }
+      })
     } else {
       await eventStore.createEvent(form.value)
-      toast.success('Event berhasil ditambahkan!')
+      toast.success('Event berhasil ditambahkan!', {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 3000,
+        style: {
+          minWidth: '250px',
+          maxWidth: '90vw'
+        }
+      })
     }
     router.push('/dashboard/crud-menu/eventview')
   } catch (error) {
     console.error('Error submitting form:', error)
-    toast.error('Terjadi kesalahan. Silakan coba lagi.')
+    toast.error('Terjadi kesalahan. Silakan coba lagi.', {
+      position: toast.POSITION.TOP_CENTER,
+      autoClose: 3000,
+      style: {
+        minWidth: '250px',
+        maxWidth: '90vw'
+      }
+    })
   } finally {
     isLoading.value = false
   }
